@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="unittesting-test-suite.xml" />
+	<munit:test name="unittesting-test-suite-unittestingFlowTest" doc:id="8e9831a9-a5ea-4db0-8727-3a56a2349f92" description="Test">
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="4e2a80f8-0101-4720-9873-b47adb886c02">
+				<munit:attributes value='#[{queryParam : {FirstName: "Ankith", LastName: "sharma"}}]' />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to unittestingFlow" doc:id="47d3cbca-2efc-434b-9de4-5529fdd35238" name="unittestingFlow"/>
+		</munit:execution>
+		<munit:validation >
+			<logger level="INFO" doc:name="Logger" doc:id="533cc743-e33b-4c22-b040-5073f3bf331a" message="#[payload]" />
+			<munit-tools:assert-that doc:name="Assert that" doc:id="c2fbcd47-67ff-404c-853a-042a3bafd962" expression="#[payload]" is='#[MunitTools::withMediaType("json")]' message='#["Failure"]'/>
+		</munit:validation>
+	</munit:test>
+
+
+</mule>

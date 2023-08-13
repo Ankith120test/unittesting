@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="8958b73d-6dde-4997-999e-c9a063ab87c3" >
+		<http:listener-connection host="localhost" port="8081" />
+	</http:listener-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="663234a9-0625-4e49-870e-8b531bf576bf" >
+		<http:request-connection host="localhost" port="8081" />
+	</http:request-config>
+	<flow name="unittestingFlow" doc:id="08bba40e-63a8-4903-93a9-5934af369ea4" >
+		<http:listener doc:name="Listener" doc:id="3794d020-6bc8-4eb3-b4ba-22d914c70f08" config-ref="HTTP_Listener_config" path="/testing"/>
+		<logger level="INFO" doc:name="Logger" doc:id="d0a249c6-acbf-4b8a-9f6f-833b47f57449" message='#[%dw 2.0&#10;output application/json&#10;---&#10; {&#10;	"uuid" : uuid(),&#10;	"Pay" : payload,&#10;	"query" : attributes.queryParams,&#10;	"method" : attributes.method&#10;	&#10;}]' />
+		<choice doc:name="Choice" doc:id="ec6d26e6-10f6-4da2-9885-d4bdb3eb59f6" >
+			<when expression='#[payload.Company == "TCS"]'>
+				<logger level="INFO" doc:name="Logger" doc:id="67693ad6-ed8f-4bb6-a240-a42d0a7a51e8" message='#["The payload has been successfully transformed"]'/>
+				<ee:transform doc:name="Transform Message" doc:id="7ffa1936-81f0-43f3-b62f-99baa616e3d4">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+fun a(value) = ((value * 25)/100) + value
+
+---
+
+{
+	"TransactionID" : uuid(),
+	"TimeStamp" : now(),
+	"EmpName" : payload.Fname,
+	"EmpRole" : payload.Role,
+	"UpdatedEmpSalary" : a(payload.Salary),
+	"ActualPay" : payload.Salary,
+	"Address" : payload.Address
+	
+	
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+			</when>
+		</choice>
+		<logger level="INFO" doc:name="Logger" doc:id="03a64858-c9be-478a-b8b7-b87a4ff7371e" message="#[payload]"/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="04401f69-232d-42ab-82d0-60fa217ad08a" type="ANY">
+				<logger level="INFO" doc:name="Logger" doc:id="5422f0fe-a747-47c5-9a4f-d8342c53f73f" message='#["your flow has failed"]'/>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="unittestingFlow1" doc:id="393b810f-4cb9-47a9-af53-bb34e63870ed" >
+		<scheduler doc:name="Scheduler" doc:id="bf29edbe-6c60-4d8c-8686-8e2a3cad0af0" >
+			<scheduling-strategy >
+				<fixed-frequency frequency="3" startDelay="10000" timeUnit="MINUTES"/>
+			</scheduling-strategy>
+		</scheduler>
+		<logger level="INFO" doc:name="Logger" doc:id="48fee0c8-b7db-42e6-b3f3-dc6b5b46ca57" message='#["Scheduler flow started"]'/>
+		<http:request method="GET" doc:name="Request" doc:id="2d3a4ecc-d615-4b65-b539-b3bd400d5516" config-ref="HTTP_Request_configuration" path="/testing"/>
+		<logger level="INFO" doc:name="Logger" doc:id="2db01fe9-9436-4fc9-ab35-b48664aff23d" message='#["after request"]'/>
+	</flow>
+</mule>

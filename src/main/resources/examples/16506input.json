@@ -1,0 +1,15 @@
+{
+	
+	"Fname" : "Ankith",
+	"Lname" : "Sharma",
+	"Role" : "software Developer",
+	"Salary" : 150000, 
+	"Company" : "TCS",
+	"IsComplaint" : true,
+	"Address" : { 
+	"Country" : "IND",
+	"State" : "KAR",
+	"CityCode" : "BLR",
+	"Pincode" : 560076
+				}
+}
